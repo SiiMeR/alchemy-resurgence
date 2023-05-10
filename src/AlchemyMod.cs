@@ -7,7 +7,7 @@ using Vintagestory.API.Client;
 
 [assembly: ModInfo(
     "AlchemyMod",
-	Version = "1.6.12",
+	Version = "1.6.11",
     Description = "An alchemy mod that adds a couple of player enhancing potions.",
     Website = "https://github.com/llama3013/vsmod-Alchemy",
     Authors = new[] { "Llama3013" },
