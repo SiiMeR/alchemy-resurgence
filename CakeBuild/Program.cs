@@ -24,7 +24,7 @@ public static class Program
 
 public class BuildContext : FrostingContext
 {
-    public const string ProjectName = "CustomAlchemy";
+    public const string ProjectName = "Alchemy";
     public string BuildConfiguration { get; set; }
     public string Version { get; }
     public string Name { get; }
