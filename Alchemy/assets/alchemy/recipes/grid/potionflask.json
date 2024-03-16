@@ -1,0 +1,197 @@
+[
+  {
+    "ingredientPattern": "Q_Q,Q_Q,QQQ",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["plain", "vintage"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-normal-quartz",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "_Q_,Q_Q,_Q_",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["plain", "vintage"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-round-quartz",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q,Q",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["plain", "vintage"] }
+    },
+    "width": 1,
+    "height": 2,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-tube-quartz",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q_Q,Q_Q,QQQ",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["pink"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-normal-pink",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "_Q_,Q_Q,_Q_",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["pink"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-round-pink",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q,Q",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["pink"] }
+    },
+    "width": 1,
+    "height": 2,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-tube-pink",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q_Q,Q_Q,QQQ",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["green"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-normal-green",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "_Q_,Q_Q,_Q_",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["green"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-round-green",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q,Q",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["green"] }
+    },
+    "width": 1,
+    "height": 2,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-tube-green",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q_Q,Q_Q,QQQ",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["violet"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-normal-violet",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "_Q_,Q_Q,_Q_",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["violet"] }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-round-violet",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q,Q",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glassslab-*-down-free", "name": "type", "allowedVariants": ["violet"] }
+    },
+    "width": 1,
+    "height": 2,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-tube-violet",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q_Q,Q_Q,QQQ",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glass-smoky" }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-normal-smoky",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "_Q_,Q_Q,_Q_",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glass-smoky" }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-round-smoky",
+      "quantity": 1
+    }
+  },
+  {
+    "ingredientPattern": "Q,Q",
+    "ingredients": {
+      "Q": { "type": "block", "code": "game:glass-smoky" }
+    },
+    "width": 1,
+    "height": 2,
+    "output": {
+      "type": "block",
+      "code": "alchemy:potionflask-tube-smoky",
+      "quantity": 1
+    }
+  }
+]

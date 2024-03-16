@@ -1,0 +1,41 @@
+{
+  "ingredient": {
+    "type": "item",
+    "code": "game:ingot-*",
+    "name": "metal",
+    "allowedVariants": [
+      "bismuth",
+      "bismuthbronze",
+      "blackbronze",
+      "brass",
+      "chromium",
+      "copper",
+      "cupronickel",
+      "electrum",
+      "gold",
+      "iron",
+      "lead",
+      "meteoriciron",
+      "molybdochalkos",
+      "nickel",
+      "platinum",
+      "silver",
+      "stainlesssteel",
+      "steel",
+      "tin",
+      "tinbronze",
+      "titanium",
+      "uranium",
+      "zinc"
+    ]
+  },
+  "pattern": [
+    [ "_____#_____", "_____#_____", "_____#_____", "_____#_____", "____###____", "###########", "____###____", "_____#_____", "_____#_____", "_____#_____", "_____#_____" ],
+    [ "___________", "___________", "___________", "___________", "____###____", "____###____", "____###____", "___________", "___________", "___________", "___________" ]
+  ],
+  "name": "Herb rack top",
+  "output": {
+    "type": "item",
+    "code": "alchemy:herbracktop-{metal}"
+  }
+}
