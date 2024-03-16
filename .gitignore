@@ -1,6 +1,6 @@
 # Ignore Visual Studio build and ReSharper folders
 **/bin/
 **/obj/
-
+**/Releases/
 # Ignore IntelliJ IDEA folder
 .idea/
