@@ -26,7 +26,7 @@ namespace Alchemy
             try
             {
                 IAsset essences = capi.Assets.TryGet("alchemy:config/essences.json");
-                imageLocation = capi.Assets.TryGet("alchemy:textures/hud/alchemyhud.png").Location;
+                imageLocation = capi.Assets.TryGet("alchemy:textures/hud/activealchemyhud.png").Location;
                 if (essences != null)
                 {
                     potionsDic = essences.ToObject<Dictionary<string, bool>>();
@@ -71,7 +71,7 @@ namespace Alchemy
 
         private void OnDraw(Context ctx, ImageSurface surface, ElementBounds currentBounds)
         {
-            BitmapRef bmp = capi.Assets.Get("alchemy:textures/hud/alchemyhud.png").ToBitmap(capi);
+            BitmapRef bmp = capi.Assets.Get("alchemy:textures/hud/activealchemyhud.png").ToBitmap(capi);
             if (inactive)
                 bmp.MulAlpha(30);
             Vintagestory.API.Common.SurfaceDrawImage.Image(

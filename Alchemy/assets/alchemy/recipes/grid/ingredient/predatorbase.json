@@ -53,6 +53,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "item",
@@ -78,6 +79,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "item",

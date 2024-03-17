@@ -265,19 +265,19 @@ namespace Alchemy
                 dsc.AppendLine(Lang.Get("\n"));
                 if (dic.ContainsKey("rangedWeaponsAcc"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged accuracy", dic["rangedWeaponsAcc"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged accuracy", Math.Round(dic["rangedWeaponsAcc"] * 100, 1)));
                 }
                 if (dic.ContainsKey("animalLootDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more animal loot", dic["animalLootDropRate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more animal loot", Math.Round(dic["animalLootDropRate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("animalHarvestingTime"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% faster animal harvest", dic["animalHarvestingTime"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% faster animal harvest", Math.Round(dic["animalHarvestingTime"] * 100, 1)));
                 }
                 if (dic.ContainsKey("animalSeekingRange"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0}% animal seek range", dic["animalSeekingRange"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0}% animal seek range", Math.Round(dic["animalSeekingRange"] * 100, 1)));
                 }
                 if (dic.ContainsKey("maxhealthExtraPoints"))
                 {
@@ -285,59 +285,59 @@ namespace Alchemy
                 }
                 if (dic.ContainsKey("forageDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0}% more forage amount", dic["forageDropRate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0}% more forage amount", Math.Round(dic["forageDropRate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("healingeffectivness"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% healing effectiveness", dic["healingeffectivness"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% healing effectiveness", Math.Round(dic["healingeffectivness"] * 100, 1)));
                 }
                 if (dic.ContainsKey("hungerrate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0}% hunger rate", dic["hungerrate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0}% hunger rate", Math.Round(dic["hungerrate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("meleeWeaponsDamage"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% melee damage", dic["meleeWeaponsDamage"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% melee damage", Math.Round(dic["meleeWeaponsDamage"] * 100, 1)));
                 }
                 if (dic.ContainsKey("mechanicalsDamage"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mechanincal damage (not sure if works)", dic["mechanicalsDamage"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mechanincal damage (not sure if works)", Math.Round(dic["mechanicalsDamage"] * 100, 1)));
                 }
                 if (dic.ContainsKey("miningSpeedMul"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mining speed", dic["miningSpeedMul"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mining speed", Math.Round(dic["miningSpeedMul"] * 100, 1)));
                 }
                 if (dic.ContainsKey("oreDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more ore", dic["oreDropRate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more ore", Math.Round(dic["oreDropRate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("rangedWeaponsDamage"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged damage", dic["rangedWeaponsDamage"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged damage", Math.Round(dic["rangedWeaponsDamage"] * 100, 1)));
                 }
                 if (dic.ContainsKey("rangedWeaponsSpeed"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged speed", dic["rangedWeaponsSpeed"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged speed", Math.Round(dic["rangedWeaponsSpeed"] * 100, 1)));
                 }
                 if (dic.ContainsKey("rustyGearDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more gears from metal piles", dic["rustyGearDropRate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more gears from metal piles", Math.Round(dic["rustyGearDropRate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("walkspeed"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% walk speed", dic["walkspeed"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% walk speed", Math.Round(dic["walkspeed"] * 100, 1)));
                 }
                 if (dic.ContainsKey("vesselContentsDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more vessel contents", dic["vesselContentsDropRate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more vessel contents", Math.Round(dic["vesselContentsDropRate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("wildCropDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% wild crop", dic["wildCropDropRate"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% wild crop", Math.Round(dic["wildCropDropRate"] * 100, 1)));
                 }
                 if (dic.ContainsKey("wholeVesselLootChance"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% chance to get whole vessel", dic["wholeVesselLootChance"] * 100));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% chance to get whole vessel", Math.Round(dic["wholeVesselLootChance"] * 100, 1)));
                 }
             }
 
