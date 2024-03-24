@@ -1,6 +1,5 @@
 {
   "code": "potionbase-basic",
-  "requiresTrait": "alchemist",
   "shape": { "base": "alchemy:item/potionbase" },
   "textures": {
     "mat1": { "base": "game:block/plant/mushroom/flyagaric/cap" },
