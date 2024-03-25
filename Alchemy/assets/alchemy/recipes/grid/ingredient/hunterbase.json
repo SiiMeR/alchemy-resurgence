@@ -1,7 +1,6 @@
 [
   {
     "ingredientPattern": "H,F,T",
-    "requiresTrait": "alchemist",
     "ingredients": {
       "H": {
         "type": "block",

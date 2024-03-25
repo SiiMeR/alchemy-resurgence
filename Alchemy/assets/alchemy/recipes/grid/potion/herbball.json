@@ -1,6 +1,5 @@
 {
   "ingredientPattern": "P,B",
-  "requiresTrait": "alchemist",
   "ingredients": {
     "P": {
       "type": "item",
