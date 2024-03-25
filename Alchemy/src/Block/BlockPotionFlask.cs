@@ -420,7 +420,7 @@ namespace Alchemy
             {
                 if (content.MatchesSearchText(byEntity.World, "potion"))
                 {
-                    if (potionId == "recallpotionid" || potionId == "nutritionpotionid")
+                    if (potionId == "nutritionpotionid")
                     {
                     }
                     else if (tickSec == 0)
@@ -474,7 +474,7 @@ namespace Alchemy
                             }
 
                             sPlayer.SendMessage(GlobalConstants.InfoLogChatGroup,
-                                "You start to recall memories of your home...", EnumChatType.Notification, null);
+                                "As you sip the recall potion, a wave of fatigue washes over you, your body growing weary as memories of home flood your mind.", EnumChatType.Notification, null);
                         }
                         else if (potionId == "nutritionpotionid")
                         {

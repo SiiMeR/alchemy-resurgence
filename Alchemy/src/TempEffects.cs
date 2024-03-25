@@ -182,11 +182,16 @@ namespace Alchemy
                 effectedEntity.World.PlayerByUid((effectedEntity as EntityPlayer).PlayerUID)
                 as IServerPlayer
             );
-            player.SendMessage(
-                GlobalConstants.InfoLogChatGroup,
-                "You feel the effects of the potion disapate",
-                EnumChatType.Notification
-            );
+
+            if (effectId != "recallpotionid")
+            {
+                player.SendMessage(
+                    GlobalConstants.InfoLogChatGroup,
+                    "You feel the effects of the potion dissipate",
+                    EnumChatType.Notification
+                );
+            }
+
         }
 
         public void resetAllTempStats(EntityPlayer entity, string effectCode)

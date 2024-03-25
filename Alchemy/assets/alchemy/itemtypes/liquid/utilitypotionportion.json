@@ -18,7 +18,11 @@
   "attributesByType": {
     "*-recall": {
       "potioninfo": {
-        "potionId": "recallpotionid"
+        "potionId": "recallpotionid",
+        "duration": 30
+      },
+      "effects": {
+        "walkspeed": -0.4
       },
       "waterTightContainerProps": {
         "containable": true,
