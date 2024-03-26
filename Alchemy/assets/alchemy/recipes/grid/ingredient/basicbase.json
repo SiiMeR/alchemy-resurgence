@@ -1,6 +1,7 @@
 [
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -26,6 +27,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -51,6 +53,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -76,6 +79,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -101,6 +105,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -126,6 +131,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -151,6 +157,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -176,6 +183,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -201,6 +209,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
@@ -226,6 +235,7 @@
   },
   {
     "ingredientPattern": "M,F,T",
+    "requiresTrait": "alchemist",
     "ingredients": {
       "M": {
         "type": "block",
