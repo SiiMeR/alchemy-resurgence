@@ -75,7 +75,7 @@
     "*-archer": {
       "potioninfo": {
         "potionId": "archerpotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "rangedWeaponsAcc": 0.05,
@@ -86,7 +86,7 @@
     "*-healingeffect": {
       "potioninfo": {
         "potionId": "healingeffectpotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "healingeffectivness": 0.15
@@ -95,7 +95,7 @@
     "*-hungerenhance": {
       "potioninfo": {
         "potionId": "hungerenhancepotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "hungerrate": 0.15
@@ -104,7 +104,7 @@
     "*-hungersupress": {
       "potioninfo": {
         "potionId": "hungersupresspotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "hungerrate": -0.15
@@ -113,7 +113,7 @@
     "*-hunter": {
       "potioninfo": {
         "potionId": "hunterpotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "animalLootDropRate": 0.05,
@@ -125,7 +125,7 @@
     "*-looter": {
       "potioninfo": {
         "potionId": "looterpotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "forageDropRate": 0.05,
@@ -137,7 +137,7 @@
     "*-melee": {
       "potioninfo": {
         "potionId": "meleepotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "meleeWeaponsDamage": 0.05
@@ -146,7 +146,7 @@
     "*-mining": {
       "potioninfo": {
         "potionId": "miningpotionid",
-        "duration": 120
+        "duration": 240
       },
       "effects": {
         "miningSpeedMul": 0.1,
@@ -166,7 +166,7 @@
     "*-predator": {
       "potioninfo": {
         "potionId": "predatorpotionid",
-        "duration": 180
+        "duration": 240
       },
       "effects": {
         "animalSeekingRange": 0.2
@@ -185,7 +185,7 @@
     "*-scentmask": {
       "potioninfo": {
         "potionId": "scentmaskpotionid",
-        "duration": 180
+        "duration": 240
       },
       "effects": {
         "animalSeekingRange": -0.2
@@ -203,7 +203,7 @@
     "*-vitality": {
       "potioninfo": {
         "potionId": "vitalitypotionid",
-        "duration": 60
+        "duration": 120
       },
       "effects": {
         "maxhealthExtraPoints": 0.1
