@@ -12,6 +12,7 @@
 	"RequiredOnClient": true,
 
 	"dependencies": {
-		"game": "1.19.4"
+		"game": "1.19.4",
+		"wildcraftherb": "0.0.0"
 	}
 }

@@ -4,7 +4,7 @@
     "ingredients": {
       "F": {
         "type": "item",
-        "code": "wildcraft:herbs-*",
+        "code": "wildcraftherb:herb-*",
         "name": "herb",
         "allowedVariants": [ "basil", "chamomile", "cilantro", "lavender", "marjoram", "mint", "saffron", "sage", "thyme" ]
       },

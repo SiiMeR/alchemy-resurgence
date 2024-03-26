@@ -1,0 +1,31 @@
+[
+  {
+    "ingredientPattern": "HS,F_,T_",
+    "ingredients": {
+      "H": {
+        "type": "item",
+        "code": "wildcraftherb:herb-basil"
+      },
+      "S": {
+        "type": "block",
+        "code": "game:flower-horsetail-free"
+      },
+      "F": {
+        "type": "block",
+        "code": "game:flower-*",
+        "allowedVariants": ["orangemallow-free", "lupine-blue-free"]
+      },
+      "T": {
+        "type": "item",
+        "code": "alchemy:mortarpestle-*",
+        "isTool": true
+      }
+    },
+    "width": 2,
+    "height": 3,
+    "output": {
+      "type": "item",
+      "code": "alchemy:herbball-archer"
+    }
+  }
+]
