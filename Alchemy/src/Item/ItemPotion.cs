@@ -17,7 +17,7 @@ namespace Alchemy
 
     public class ItemPotion : Item
     {
-        public Dictionary<string, float> dic = new Dictionary<string, float>();
+        public Dictionary<string, float> dic = new();
         public string potionId;
         public int duration;
         public int tickSec = 0;
@@ -138,7 +138,6 @@ namespace Alchemy
             //api.Logger.Debug("potion {0}, {1}", dic.Count, potionId);
             if (potionId != "" && potionId != null)
             {
-                string poop = potionId;
                 //api.Logger.Debug("[Potion] check if drinkable {0}", byEntity.WatchedAttributes.GetLong(potionId));
                 /* This checks if the potion effect callback is on */
                 if (byEntity.WatchedAttributes.GetLong(potionId) == 0)

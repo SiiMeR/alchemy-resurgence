@@ -5,10 +5,6 @@ using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Server;
 using Vintagestory.API.Client;
 
-/*json block glow
-vertexFlags: {
-    glowLevel: 255
-},*/
 /* Quick reference to all attributes that change the characters Stats:
    healingeffectivness, maxhealthExtraPoints, walkspeed, hungerrate, rangedWeaponsAcc, rangedWeaponsSpeed
    rangedWeaponsDamage, meleeWeaponsDamage, mechanicalsDamage, animalLootDropRate, forageDropRate, wildCropDropRate
@@ -44,12 +40,10 @@ namespace Alchemy
                     Entity entity = iServerPlayer.Entity;
                     entity.AddBehavior(new PotionFixBehavior(entity));
 
-                    //api.Logger.Debug("[Potion] Adding PotionFixBehavior to spawned EntityPlayer");
                     TempEffect tempEffect = new TempEffect();
                     EntityPlayer player = (iServerPlayer.Entity as EntityPlayer);
                     tempEffect.resetAllTempStats(player, "potionmod");
                     tempEffect.resetAllAttrListeners(player, "potionid", "tickpotionid");
-                    //api.Logger.Debug("potion player ready");
                 }
             };
         }

@@ -25,7 +25,7 @@ namespace Alchemy
 
         public override float CapacityLitres => Props.CapacityLitres;
 
-        public Dictionary<string, float> dic = new Dictionary<string, float>();
+        public Dictionary<string, float> effectsDictionary = new();
 
         public string potionId = "";
 
@@ -230,141 +230,133 @@ namespace Alchemy
             ref EnumHandHandling handling
         )
         {
-            ItemStack contentStack = GetContent(slot.Itemstack);
-            if (contentStack != null)
-            {
-                if (contentStack.MatchesSearchText(byEntity.World, "potion"))
-                {
-                    string strength = contentStack.Item.Variant["strength"] is string str
-                        ? string.Intern(str)
-                        : "none";
-                    try
-                    {
-                        JsonObject potion = contentStack.ItemAttributes?["potioninfo"];
-                        if (potion?.Exists == true)
-                        {
-                            potionId = potion["potionId"].AsString();
-                            duration = potion["duration"].AsInt();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        api.World.Logger.Error(
-                            "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
-                            Code,
-                            e
-                        );
-                        potionId = "";
-                        duration = 0;
-                    }
-
-                    try
-                    {
-                        JsonObject tickPotion = contentStack.ItemAttributes?["tickpotioninfo"];
-                        if (tickPotion?.Exists == true)
-                        {
-                            tickSec = tickPotion["ticksec"].AsInt();
-                            health = tickPotion["health"].AsFloat();
-                            switch (strength)
-                            {
-                                case "strong":
-                                    health *= 3;
-                                    break;
-                                case "medium":
-                                    health *= 2;
-                                    break;
-                                default:
-                                    break;
-                            }
-                            //api.Logger.Debug("potion {0}, {1}, potionId, duration);
-                        }
-                        else
-                        {
-                            tickSec = 0;
-                            health = 0;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        api.World.Logger.Error(
-                            "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
-                            Code,
-                            e
-                        );
-                        tickSec = 0;
-                        health = 0;
-                    }
-
-                    try
-                    {
-                        JsonObject effects = contentStack.ItemAttributes?["effects"];
-                        if (effects?.Exists == true)
-                        {
-                            dic = effects.AsObject<Dictionary<string, float>>();
-                            switch (strength)
-                            {
-                                case "strong":
-                                    foreach (var k in dic.Keys.ToList())
-                                    {
-                                        dic[k] *= 3;
-                                    }
-
-                                    break;
-                                case "medium":
-                                    foreach (var k in dic.Keys.ToList())
-                                    {
-                                        dic[k] *= 2;
-                                    }
-
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            dic.Clear();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        api.World.Logger.Error(
-                            "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
-                            Code,
-                            e
-                        );
-                        dic.Clear();
-                    }
-
-                    if (potionId != "" && potionId != null)
-                    {
-                        //api.Logger.Debug("potion {0}, {1}", dic.Count, potionId);
-                        //api.Logger.Debug("[Potion] check if drinkable {0}", byEntity.WatchedAttributes.GetLong(potionId));
-                        /* This checks if the potion effect callback is on */
-                        if (byEntity.WatchedAttributes.GetLong(potionId) == 0)
-                        {
-                            //api.Logger.Debug("potion {0}", byEntity.WatchedAttributes.GetLong(potionId));
-                            byEntity.World.RegisterCallback(
-                                (dt) => playEatSound(byEntity, "drink", 1),
-                                500
-                            );
-                            handling = EnumHandHandling.PreventDefault;
-                        }
-                    }
-
-                    return;
-                }
-            }
-            else
+            var contentStack = GetContent(slot.Itemstack);
+            if (contentStack == null)
             {
                 potionId = "";
                 duration = 0;
                 tickSec = 0;
                 health = 0;
-                dic.Clear();
+                effectsDictionary.Clear();
+                base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
+                return;
             }
 
-            base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
+            if (!contentStack.MatchesSearchText(byEntity.World, "potion"))
+            {
+                base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
+                return;
+            }
+            
+            var strength = string.IsNullOrWhiteSpace(contentStack.Item.Variant["strength"])
+                ? string.Intern(contentStack.Item.Variant["strength"])
+                : "none";
+            try
+            {
+                var potionInfo = contentStack.ItemAttributes?["potioninfo"];
+                if (potionInfo?.Exists ?? false)
+                {
+                    potionId = potionInfo["potionId"].AsString();
+                    duration = potionInfo["duration"].AsInt();
+                }
+            }
+            catch (Exception e)
+            {
+                api.World.Logger.Error(
+                    "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
+                    Code,
+                    e
+                );
+                potionId = "";
+                duration = 0;
+            }
+
+            try
+            {
+                var tickPotionInfo = contentStack.ItemAttributes?["tickpotioninfo"];
+                if (tickPotionInfo?.Exists ?? false)
+                {
+                    tickSec = tickPotionInfo["ticksec"].AsInt();
+                    health = tickPotionInfo["health"].AsFloat();
+                    switch (strength)
+                    {
+                        case "strong":
+                            health *= 3;
+                            break;
+                        case "medium":
+                            health *= 2;
+                            break;
+                    }
+                }
+                else
+                {
+                    tickSec = 0;
+                    health = 0;
+                }
+            }
+            catch (Exception e)
+            {
+                api.World.Logger.Error(
+                    "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
+                    Code,
+                    e
+                );
+                tickSec = 0;
+                health = 0;
+            }
+
+            try
+            {
+                var effects = contentStack.ItemAttributes?["effects"];
+                if (effects?.Exists ?? false)
+                {
+                    effectsDictionary = effects.AsObject<Dictionary<string, float>>();
+                    switch (strength)
+                    {
+                        case "strong":
+                            foreach (var k in effectsDictionary.Keys.ToList())
+                            {
+                                effectsDictionary[k] *= 3;
+                            }
+
+                            break;
+                        case "medium":
+                            foreach (var k in effectsDictionary.Keys.ToList())
+                            {
+                                effectsDictionary[k] *= 2;
+                            }
+
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    effectsDictionary.Clear();
+                }
+            }
+            catch (Exception e)
+            {
+                api.World.Logger.Error(
+                    "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
+                    Code,
+                    e
+                );
+                effectsDictionary.Clear();
+            }
+
+            if (string.IsNullOrEmpty(potionId)) 
+                return;
+            
+            if (byEntity.WatchedAttributes.GetLong(potionId) != 0) return;
+            
+            byEntity.World.RegisterCallback(
+                (dt) => playEatSound(byEntity, "drink", 1),
+                500
+            );
+            
+            handling = EnumHandHandling.PreventDefault;
         }
 
         public override bool OnHeldInteractStep(
@@ -428,7 +420,7 @@ namespace Alchemy
                         TempEffect potionEffect = new TempEffect();
                         potionEffect.tempEntityStats(
                             (byEntity as EntityPlayer),
-                            dic,
+                            effectsDictionary,
                             "potionmod",
                             duration,
                             potionId
@@ -439,7 +431,7 @@ namespace Alchemy
                         TempEffect potionEffect = new TempEffect();
                         potionEffect.tempTickEntityStats(
                             (byEntity as EntityPlayer),
-                            dic,
+                            effectsDictionary,
                             "potionmod",
                             duration,
                             potionId,
@@ -545,7 +537,7 @@ namespace Alchemy
                         duration = 0;
                         tickSec = 0;
                         health = 0;
-                        dic.Clear();
+                        effectsDictionary.Clear();
                         return;
                     }
 
