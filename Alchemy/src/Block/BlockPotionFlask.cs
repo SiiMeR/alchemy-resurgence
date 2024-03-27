@@ -247,8 +247,8 @@ namespace Alchemy
                 base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
                 return;
             }
-            
-            var strength = string.IsNullOrWhiteSpace(contentStack.Item.Variant["strength"])
+
+            var strength = !string.IsNullOrWhiteSpace(contentStack.Item.Variant["strength"])
                 ? string.Intern(contentStack.Item.Variant["strength"])
                 : "none";
             try
@@ -346,16 +346,16 @@ namespace Alchemy
                 effectsDictionary.Clear();
             }
 
-            if (string.IsNullOrEmpty(potionId)) 
+            if (string.IsNullOrEmpty(potionId))
                 return;
-            
+
             if (byEntity.WatchedAttributes.GetLong(potionId) != 0) return;
-            
+
             byEntity.World.RegisterCallback(
                 (dt) => playEatSound(byEntity, "drink", 1),
                 500
             );
-            
+
             handling = EnumHandHandling.PreventDefault;
         }
 
@@ -407,145 +407,134 @@ namespace Alchemy
             EntitySelection entitySel
         )
         {
-            ItemStack content = GetContent(slot.Itemstack);
-            if (secondsUsed > 1.45f && byEntity.World.Side == EnumAppSide.Server && content != null)
+            var content = GetContent(slot.Itemstack);
+            if (secondsUsed < 1.45f || byEntity.World.Side != EnumAppSide.Server || content == null ||
+                byEntity is not EntityPlayer playerEntity)
             {
-                if (content.MatchesSearchText(byEntity.World, "potion"))
-                {
-                    if (potionId == "nutritionpotionid")
-                    {
-                    }
-                    else if (tickSec == 0)
-                    {
-                        TempEffect potionEffect = new TempEffect();
-                        potionEffect.tempEntityStats(
-                            (byEntity as EntityPlayer),
-                            effectsDictionary,
-                            "potionmod",
-                            duration,
-                            potionId
-                        );
-                    }
-                    else
-                    {
-                        TempEffect potionEffect = new TempEffect();
-                        potionEffect.tempTickEntityStats(
-                            (byEntity as EntityPlayer),
-                            effectsDictionary,
-                            "potionmod",
-                            duration,
-                            potionId,
-                            tickSec,
-                            health
-                        );
-                    }
-
-                    if (byEntity is EntityPlayer)
-                    {
-                        IServerPlayer sPlayer = (
-                            byEntity.World.PlayerByUid((byEntity as EntityPlayer).PlayerUID)
-                                as IServerPlayer
-                        );
-                        if (potionId == "recallpotionid")
-                        {
-                            if (api.Side.IsServer())
-                            {
-                                byEntity.World.RegisterCallback(
-                                    (dt) =>
-                                    {
-                                        sPlayer.SendMessage(
-                                            GlobalConstants.InfoLogChatGroup,
-                                            "You feel the effects of the " + content.GetName(),
-                                            EnumChatType.Notification
-                                        );
-                                        FuzzyEntityPos spawn = sPlayer.GetSpawnPosition(false);
-                                        byEntity.TeleportTo(spawn);
-                                    },
-                                    30000
-                                );
-                            }
-
-                            sPlayer.SendMessage(GlobalConstants.InfoLogChatGroup,
-                                "As you sip the recall potion, a wave of fatigue washes over you, your body growing weary as memories of home flood your mind.", EnumChatType.Notification, null);
-                        }
-                        else if (potionId == "nutritionpotionid")
-                        {
-                            ITreeAttribute hungerTree = byEntity.WatchedAttributes.GetTreeAttribute(
-                                "hunger"
-                            );
-                            if (hungerTree != null)
-                            {
-                                // SortedList<string, float> oldSatietyLevels = new SortedList<string, float>();
-                                // oldSatietyLevels.Add("fruitlevel", hungerTree.GetFloat("fruitLevel"));
-                                // oldSatietyLevels.Add("vegetableLevel", hungerTree.GetFloat("vegetableLevel"));
-                                // oldSatietyLevels.Add("grainLevel", hungerTree.GetFloat("grainLevel"));
-                                // oldSatietyLevels.Add("proteinLevel", hungerTree.GetFloat("proteinLevel"));
-                                // oldSatietyLevels.Add("dairyLevel", hungerTree.GetFloat("dairyLevel"));
-                                // foreach( KeyValuePair<string, float> kvp in oldSatietyLevels )
-                                // {
-                                //     byEntity.World.Logger.Debug("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-                                // }
-                                // var newSatietyLevels = oldSatietyLevels.OrderByDescending(kvp => kvp.Value);
-                                // foreach( KeyValuePair<string, float> kvp in newSatietyLevels )
-                                // {
-                                //     byEntity.World.Logger.Debug("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-                                // }
-                                float totalSatiety =
-                                (
-                                    hungerTree.GetFloat("fruitLevel")
-                                    + hungerTree.GetFloat("vegetableLevel")
-                                    + hungerTree.GetFloat("grainLevel")
-                                    + hungerTree.GetFloat("proteinLevel")
-                                    + hungerTree.GetFloat("dairyLevel")
-                                ) * 0.9f;
-                                hungerTree.SetFloat("fruitLevel", Math.Max(totalSatiety / 5, 0));
-                                hungerTree.SetFloat(
-                                    "vegetableLevel",
-                                    Math.Max(totalSatiety / 5, 0)
-                                );
-                                hungerTree.SetFloat("grainLevel", Math.Max(totalSatiety / 5, 0));
-                                hungerTree.SetFloat("proteinLevel", Math.Max(totalSatiety / 5, 0));
-                                hungerTree.SetFloat("dairyLevel", Math.Max(totalSatiety / 5, 0));
-                                byEntity.WatchedAttributes.MarkPathDirty("hunger");
-                            }
-                        }
-                        else
-                        {
-                            sPlayer.SendMessage(
-                                GlobalConstants.InfoLogChatGroup,
-                                "You feel the effects of the " + content.GetName(),
-                                EnumChatType.Notification
-                            );
-                        }
-                    }
-
-                    IPlayer player = null;
-                    if (byEntity is EntityPlayer)
-                        player = byEntity.World.PlayerByUid(((EntityPlayer)byEntity).PlayerUID);
-
-                    splitStackAndPerformAction(
-                        byEntity,
-                        slot,
-                        (stack) => TryTakeLiquid(stack, 0.25f)?.StackSize ?? 0
-                    );
-                    slot.MarkDirty();
-
-                    EntityPlayer entityPlayer = byEntity as EntityPlayer;
-                    if (entityPlayer == null)
-                    {
-                        potionId = "";
-                        duration = 0;
-                        tickSec = 0;
-                        health = 0;
-                        effectsDictionary.Clear();
-                        return;
-                    }
-
-                    entityPlayer.Player.InventoryManager.BroadcastHotbarSlot();
-                }
+                potionId = "";
+                duration = 0;
+                tickSec = 0;
+                health = 0;
+                effectsDictionary.Clear();
+                
+                base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+                return;
             }
 
-            base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+            if (!content.MatchesSearchText(playerEntity.World, "potion"))
+            {
+                base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
+                return;
+            }
+
+            if (potionId == "nutritionpotionid")
+            {
+            }
+            else if (tickSec == 0)
+            {
+                TempEffect potionEffect = new TempEffect();
+                potionEffect.tempEntityStats(
+                    playerEntity,
+                    effectsDictionary,
+                    "potionmod",
+                    duration,
+                    potionId
+                );
+            }
+            else
+            {
+                TempEffect potionEffect = new TempEffect();
+                potionEffect.tempTickEntityStats(
+                    playerEntity,
+                    effectsDictionary,
+                    "potionmod",
+                    duration,
+                    potionId,
+                    tickSec,
+                    health
+                );
+            }
+
+            if (playerEntity.Player is not IServerPlayer serverPlayer)
+            {
+                api.Logger.Debug($"playerEntity.Player is null for {playerEntity.PlayerUID}");
+                base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
+                return;
+            }
+            
+            switch (potionId)
+            {
+                case "recallpotionid":
+                {
+                    if (api.Side.IsServer())
+                    {
+                        playerEntity.World.RegisterCallback(
+                            (dt) =>
+                            {
+                                serverPlayer.SendMessage(
+                                    GlobalConstants.InfoLogChatGroup,
+                                    "You feel the effects of the " + content.GetName(),
+                                    EnumChatType.Notification
+                                );
+                                FuzzyEntityPos spawn = serverPlayer.GetSpawnPosition(false);
+                                byEntity.TeleportTo(spawn);
+                            },
+                            30000
+                        );
+                    }
+
+                    serverPlayer.SendMessage(GlobalConstants.InfoLogChatGroup,
+                        "As you sip the recall potion, a wave of fatigue washes over you, your body growing weary as memories of home flood your mind.",
+                        EnumChatType.Notification, null);
+                    break;
+                }
+                case "nutritionpotionid":
+                {
+                    ITreeAttribute hungerTree = playerEntity.WatchedAttributes.GetTreeAttribute(
+                        "hunger"
+                    );
+                    if (hungerTree != null)
+                    {
+                        var totalSatiety =
+                        (
+                            hungerTree.GetFloat("fruitLevel")
+                            + hungerTree.GetFloat("vegetableLevel")
+                            + hungerTree.GetFloat("grainLevel")
+                            + hungerTree.GetFloat("proteinLevel")
+                            + hungerTree.GetFloat("dairyLevel")
+                        ) * 0.9f;
+                        hungerTree.SetFloat("fruitLevel", Math.Max(totalSatiety / 5, 0));
+                        hungerTree.SetFloat(
+                            "vegetableLevel",
+                            Math.Max(totalSatiety / 5, 0)
+                        );
+                        hungerTree.SetFloat("grainLevel", Math.Max(totalSatiety / 5, 0));
+                        hungerTree.SetFloat("proteinLevel", Math.Max(totalSatiety / 5, 0));
+                        hungerTree.SetFloat("dairyLevel", Math.Max(totalSatiety / 5, 0));
+                        playerEntity.WatchedAttributes.MarkPathDirty("hunger");
+                    }
+
+                    break;
+                }
+                default:
+                    serverPlayer.SendMessage(
+                        GlobalConstants.InfoLogChatGroup,
+                        "You feel the effects of the " + content.GetName(),
+                        EnumChatType.Notification
+                    );
+                    break;
+            }
+
+            splitStackAndPerformAction(
+                playerEntity,
+                slot,
+                (stack) => TryTakeLiquid(stack, 0.25f)?.StackSize ?? 0
+            );
+            slot.MarkDirty();
+
+            playerEntity.Player.InventoryManager.BroadcastHotbarSlot();
+
+            base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
         }
 
         #endregion
@@ -639,10 +628,7 @@ namespace Alchemy
         {
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
             ItemStack content = GetContent(inSlot.Itemstack);
-            if (content != null)
-            {
-                content.Collectible.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            }
+            content?.Collectible.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
         }
     }
 
