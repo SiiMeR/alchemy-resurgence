@@ -17,7 +17,6 @@ namespace Alchemy
 
         public override void Start(ICoreAPI api)
         {
-            //api.Logger.Debug("[Potion] Start");
             base.Start(api);
 
             var harmony = new Harmony("Alchemy");
@@ -28,6 +27,7 @@ namespace Alchemy
             api.RegisterBlockEntityClass("BlockEntityPotionFlask", typeof(BlockEntityPotionFlask));
             api.RegisterBlockClass("BlockHerbRacks", typeof(BlockHerbRacks));
             api.RegisterBlockEntityClass("HerbRacks", typeof(BlockEntityHerbRacks));
+            
         }
 
         /* This override is to add the PotionFixBehavior to the player and to reset all of the potion stats to default */
@@ -35,15 +35,14 @@ namespace Alchemy
         {
             api.Event.PlayerNowPlaying += (IServerPlayer iServerPlayer) =>
             {
-                if (iServerPlayer.Entity is EntityPlayer)
+                if (iServerPlayer.Entity is not null)
                 {
                     Entity entity = iServerPlayer.Entity;
                     entity.AddBehavior(new PotionFixBehavior(entity));
 
-                    TempEffect tempEffect = new TempEffect();
-                    EntityPlayer player = (iServerPlayer.Entity as EntityPlayer);
-                    tempEffect.resetAllTempStats(player, "potionmod");
-                    tempEffect.resetAllAttrListeners(player, "potionid", "tickpotionid");
+                    EntityPlayer player = iServerPlayer.Entity;
+                    TempEffect.ResetAllTempStats(player, "potionmod");
+                    TempEffect.ResetAllAttrListeners(player, "potionid", "tickpotionid");
                 }
             };
         }

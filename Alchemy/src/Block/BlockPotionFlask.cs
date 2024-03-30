@@ -25,19 +25,17 @@ namespace Alchemy
 
         public override float CapacityLitres => Props.CapacityLitres;
 
-        public Dictionary<string, float> effectsDictionary = new();
+        public Dictionary<string, float> EffectDictionary = new();
 
         public string potionId = "";
 
         public int duration = 0;
-
-        public int tickSec = 0;
-
+        
         public float health = 0;
 
-        public override void OnLoaded(ICoreAPI api)
+        public override void OnLoaded(ICoreAPI coreApi)
         {
-            base.OnLoaded(api);
+            base.OnLoaded(coreApi);
 
             if (Attributes?["liquidContainerProps"].Exists == true)
             {
@@ -46,6 +44,7 @@ namespace Alchemy
                     Code.Domain
                 );
             }
+
         }
 
         #region Render
@@ -235,9 +234,8 @@ namespace Alchemy
             {
                 potionId = "";
                 duration = 0;
-                tickSec = 0;
                 health = 0;
-                effectsDictionary.Clear();
+                EffectDictionary.Clear();
                 base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
                 return;
             }
@@ -273,57 +271,23 @@ namespace Alchemy
 
             try
             {
-                var tickPotionInfo = contentStack.ItemAttributes?["tickpotioninfo"];
-                if (tickPotionInfo?.Exists ?? false)
-                {
-                    tickSec = tickPotionInfo["ticksec"].AsInt();
-                    health = tickPotionInfo["health"].AsFloat();
-                    switch (strength)
-                    {
-                        case "strong":
-                            health *= 3;
-                            break;
-                        case "medium":
-                            health *= 2;
-                            break;
-                    }
-                }
-                else
-                {
-                    tickSec = 0;
-                    health = 0;
-                }
-            }
-            catch (Exception e)
-            {
-                api.World.Logger.Error(
-                    "Failed loading potion effects for potion {0}. Will ignore. Exception: {1}",
-                    Code,
-                    e
-                );
-                tickSec = 0;
-                health = 0;
-            }
-
-            try
-            {
                 var effects = contentStack.ItemAttributes?["effects"];
                 if (effects?.Exists ?? false)
                 {
-                    effectsDictionary = effects.AsObject<Dictionary<string, float>>();
+                    EffectDictionary = effects.AsObject<Dictionary<string, float>>();
                     switch (strength)
                     {
                         case "strong":
-                            foreach (var k in effectsDictionary.Keys.ToList())
+                            foreach (var k in EffectDictionary.Keys.ToList())
                             {
-                                effectsDictionary[k] *= 3;
+                                EffectDictionary[k] *= 3;
                             }
 
                             break;
                         case "medium":
-                            foreach (var k in effectsDictionary.Keys.ToList())
+                            foreach (var k in EffectDictionary.Keys.ToList())
                             {
-                                effectsDictionary[k] *= 2;
+                                EffectDictionary[k] *= 2;
                             }
 
                             break;
@@ -333,7 +297,7 @@ namespace Alchemy
                 }
                 else
                 {
-                    effectsDictionary.Clear();
+                    EffectDictionary.Clear();
                 }
             }
             catch (Exception e)
@@ -343,7 +307,7 @@ namespace Alchemy
                     Code,
                     e
                 );
-                effectsDictionary.Clear();
+                EffectDictionary.Clear();
             }
 
             if (string.IsNullOrEmpty(potionId))
@@ -370,33 +334,28 @@ namespace Alchemy
             Vec3d pos = byEntity.Pos.AheadCopy(0.4f).XYZ.Add(byEntity.LocalEyePos);
             pos.Y -= 0.4f;
 
-            IPlayer player = (byEntity as EntityPlayer).Player;
+            if (byEntity.World is not IClientWorldAccessor) return true;
+            ModelTransform tf = new ModelTransform();
+            tf.Origin.Set(1.1f, 0.5f, 0.5f);
+            tf.EnsureDefaultValues();
 
-            if (byEntity.World is IClientWorldAccessor)
+            tf.Translation.X -=
+                Math.Min(1.7f, secondsUsed * 4 * 1.8f) / FpHandTransform.ScaleXYZ.X;
+            tf.Translation.Y += Math.Min(0.4f, secondsUsed * 1.8f) / FpHandTransform.ScaleXYZ.X;
+            tf.Scale = 1 + Math.Min(0.5f, secondsUsed * 4 * 1.8f) / FpHandTransform.ScaleXYZ.X;
+            tf.Rotation.X +=
+                Math.Min(40f, secondsUsed * 350 * 0.75f) / FpHandTransform.ScaleXYZ.X;
+
+            if (secondsUsed > 0.5f)
             {
-                ModelTransform tf = new ModelTransform();
-                tf.Origin.Set(1.1f, 0.5f, 0.5f);
-                tf.EnsureDefaultValues();
-
-                tf.Translation.X -=
-                    Math.Min(1.7f, secondsUsed * 4 * 1.8f) / FpHandTransform.ScaleXYZ.X;
-                tf.Translation.Y += Math.Min(0.4f, secondsUsed * 1.8f) / FpHandTransform.ScaleXYZ.X;
-                tf.Scale = 1 + Math.Min(0.5f, secondsUsed * 4 * 1.8f) / FpHandTransform.ScaleXYZ.X;
-                tf.Rotation.X +=
-                    Math.Min(40f, secondsUsed * 350 * 0.75f) / FpHandTransform.ScaleXYZ.X;
-
-                if (secondsUsed > 0.5f)
-                {
-                    tf.Translation.Y +=
-                        GameMath.Sin(30 * secondsUsed) / 10 / FpHandTransform.ScaleXYZ.Y;
-                }
-
-                byEntity.Controls.UsingHeldItemTransformBefore = tf;
-
-                return secondsUsed <= 1.5f;
+                tf.Translation.Y +=
+                    GameMath.Sin(30 * secondsUsed) / 10 / FpHandTransform.ScaleXYZ.Y;
             }
 
-            return true;
+            byEntity.Controls.UsingHeldItemTransformBefore = tf;
+
+            return secondsUsed <= 1.5f;
+
         }
 
         public override void OnHeldInteractStop(
@@ -411,12 +370,6 @@ namespace Alchemy
             if (secondsUsed < 1.45f || byEntity.World.Side != EnumAppSide.Server || content == null ||
                 byEntity is not EntityPlayer playerEntity)
             {
-                potionId = "";
-                duration = 0;
-                tickSec = 0;
-                health = 0;
-                effectsDictionary.Clear();
-                
                 base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
                 return;
             }
@@ -430,31 +383,36 @@ namespace Alchemy
             if (potionId == "nutritionpotionid")
             {
             }
-            else if (tickSec == 0)
-            {
-                TempEffect potionEffect = new TempEffect();
-                potionEffect.tempEntityStats(
-                    playerEntity,
-                    effectsDictionary,
-                    "potionmod",
-                    duration,
-                    potionId
-                );
-            }
             else
             {
-                TempEffect potionEffect = new TempEffect();
-                potionEffect.tempTickEntityStats(
-                    playerEntity,
-                    effectsDictionary,
-                    "potionmod",
-                    duration,
-                    potionId,
-                    tickSec,
-                    health
-                );
+                JsonObject tickPotion = content.ItemAttributes?["tickpotioninfo"];
+                if (tickPotion?.Exists ?? false)
+                {
+                    TempEffect potionEffect = new TempEffect();
+                    potionEffect.TempEntityStats(
+                        playerEntity,
+                        EffectDictionary,
+                        "potionmod",
+                        duration,
+                        potionId,
+                        true,
+                        tickPotion["ticksec"].AsInt(5),
+                        tickPotion["health"].AsFloat()
+                    );
+                }
+                else
+                {
+                    TempEffect potionEffect = new TempEffect();
+                    potionEffect.TempEntityStats(
+                        playerEntity,
+                        EffectDictionary,
+                        "potionmod",
+                        duration,
+                        potionId
+                    );
+                }
             }
-
+            
             if (playerEntity.Player is not IServerPlayer serverPlayer)
             {
                 api.Logger.Debug($"playerEntity.Player is null for {playerEntity.PlayerUID}");

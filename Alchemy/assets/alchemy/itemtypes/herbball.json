@@ -3,7 +3,7 @@
   "variantgroups": [
     {
       "code": "potiontype",
-      "states": [ "all", "alltick", "archer", "healingeffect", "hungerenhance", "hungersupress", "hunter", "looter", "melee", "mining", "poison", "predator", "regen", "scentmask", "speed", "vitality" ]
+      "states": [ "all", "archer", "healingeffect", "hungerenhance", "hungersupress", "hunter", "looter", "melee", "mining", "poison", "predator", "regen", "scentmask", "speed", "vitality" ]
     }
   ],
   "class": "ItemPotion",
@@ -16,40 +16,6 @@
       "effects": {
         "healingeffectivness": 0.1,
         "maxhealthExtraPoints": 0.5,
-        "walkspeed": 0.05,
-        "hungerrate": -0.1,
-        "rangedWeaponsAcc": 0.05,
-        "rangedWeaponsSpeed": 0.05,
-        "rangedWeaponsDamage": 0.05,
-        "meleeWeaponsDamage": 0.05,
-        "mechanicalsDamage": 0.05,
-        "animalLootDropRate": 0.05,
-        "forageDropRate": 0.05,
-        "wildCropDropRate": 0.05,
-        "vesselContentsDropRate": 0.05,
-        "rustyGearDropRate": 0.05,
-        "miningSpeedMul": 0.15,
-        "oreDropRate": 0.075,
-        "animalSeekingRange": 0.05,
-        "wholeVesselLootChance": 0.05,
-        "animalHarvestingTime": 0.05
-      },
-      "handbook": {
-        "exclude": true
-      }
-    },
-    "*-alltick": {
-      "potioninfo": {
-        "potionId": "alltickpotionid",
-        "duration": 10
-      },
-      "tickpotioninfo": {
-        "ticksec": 1,
-        "health": 1
-      },
-      "effects": {
-        "healingeffectivness": 0.1,
-        "maxhealthExtraPoints": 0.1,
         "walkspeed": 0.05,
         "hungerrate": -0.1,
         "rangedWeaponsAcc": 0.05,

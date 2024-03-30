@@ -9,9 +9,8 @@ namespace Alchemy
 {
     public class TempEffect
     {
-        EntityPlayer effectedEntity;
-
-        Dictionary<string, float> effectedList;
+        private EntityPlayer _affectedEntity;
+        private Dictionary<string, float> _effectedList;
 
         string effectCode;
 
@@ -25,94 +24,87 @@ namespace Alchemy
         /// <param name="code"> The identity of what is changing the stat. If "code" is present on same stat then the latest Set will override it. </param>
         /// <param name="duration"> The amount of time in seconds that the stat will be changed for. </param>
         /// <param name="id"> The id for the RegisterCallback which is saved to WatchedAttributes </param>
-        public void tempEntityStats(
-            EntityPlayer entity,
-            Dictionary<string, float> effectList,
-            string code,
-            int duration,
-            string id
-        )
-        {
-            effectedEntity = entity;
-            effectedList = effectList;
-            effectCode = code;
-            effectId = id;
-            if (effectedList.Count >= 1)
-            {
-                setTempStats();
-            }
-            long effectIdCallback = effectedEntity.World.RegisterCallback(
-                resetTempStats,
-                duration * 1000
-            );
-            effectedEntity.WatchedAttributes.SetLong(effectId, effectIdCallback);
-        }
-
-        int effectDuration;
-
-        int effectTickSec;
-
-        float effectHealth = 0;
-
-        /// <summary>
-        /// This needs to be called to give the entity the new stats and to give setTempStats and resetTempStats the variables it needs.
-        /// </summary>
-        /// <param name="entity"> The entity that will have their stats changed </param>
-        /// <param name="effectList"> A dictionary filled with the stat to be changed and the amount to add/remove </param>
-        /// <param name="code"> The identity of what is changing the stat. If "code" is present on same stat then the latest Set will override it. </param>
-        /// <param name="duration"> The amount of time in seconds that the stat will be changed for. </param>
-        /// <param name="id"> The id for the RegisterCallback which is saved to WatchedAttributes </param>
-        public void tempTickEntityStats(
+        /// <param name="tickTimeSeconds">How long does a tick take</param>
+        /// <param name="hpPerTick">How much HP the entity will gain/lose per tick</param>
+        /// <param name="shouldTick">If the potion is a tick effect, this should be set to true.</param>
+        public void TempEntityStats(
             EntityPlayer entity,
             Dictionary<string, float> effectList,
             string code,
             int duration,
             string id,
-            int tickSec,
-            float health
+            bool shouldTick = false,
+            int tickTimeSeconds = 0,
+            float hpPerTick = 0
         )
         {
-            effectedEntity = entity;
-            effectedList = effectList;
+            _affectedEntity = entity;
+            _effectedList = effectList;
             effectCode = code;
             effectId = id;
-            effectDuration = duration;
-            effectTickSec = tickSec;
-            effectHealth = health;
-            if (effectedList.Count >= 1)
+            if (shouldTick)
             {
-                setTempStats();
+                HandleTickPotion(duration, tickTimeSeconds, hpPerTick);
             }
-            long effectIdGametick = entity.World.RegisterGameTickListener(onEffectTick, 1000);
-            effectedEntity.WatchedAttributes.SetLong(effectId, effectIdGametick);
+            else
+            {
+                SetTempStats();
+            }
+        }
+
+        private void HandleTickPotion(int durationSeconds, int tickTimeSeconds, float hpPerTick)
+        {
+            var invocations = durationSeconds / tickTimeSeconds;
+
+            for (int i = 0; i < invocations; i++)
+            {
+                _affectedEntity.World.RegisterCallback((dt) =>
+                {
+                    _affectedEntity.ReceiveDamage(
+                        new DamageSource
+                        {
+                            Source = EnumDamageSource.Internal,
+                            Type = hpPerTick > 0 ? EnumDamageType.Heal : EnumDamageType.Poison
+                        },
+                        Math.Abs(hpPerTick)
+                    );
+                }, i * tickTimeSeconds * 1000);
+            }
+
+            var id =_affectedEntity.World.RegisterCallback(_ =>
+            {
+                ResetTempStats();
+            }, durationSeconds * 1000);
+            
+            _affectedEntity.WatchedAttributes.SetLong(effectId, id);
         }
 
         /// <summary>
         /// Iterates through the provided effect dictionary and sets every stat provided
         /// </summary>
-        public void setTempStats()
+        public void SetTempStats()
         {
-            if (effectedList.ContainsKey("maxhealthExtraPoints"))
+            if (_effectedList.ContainsKey("maxhealthExtraPoints"))
             {
-                effectedEntity.World.Api.Logger.Debug(
+                _affectedEntity.World.Api.Logger.Debug(
                     "blendedhealth {0}",
-                    effectedEntity.Stats.GetBlended("maxhealthExtraPoints")
+                    _affectedEntity.Stats.GetBlended("maxhealthExtraPoints")
                 );
-                effectedEntity.World.Api.Logger.Debug(
+                _affectedEntity.World.Api.Logger.Debug(
                     "maxhealthExtraPoints {0}",
-                    effectedList["maxhealthExtraPoints"]
+                    _effectedList["maxhealthExtraPoints"]
                 );
-                effectedList["maxhealthExtraPoints"] =
-                    (14f + effectedEntity.Stats.GetBlended("maxhealthExtraPoints"))
-                    * effectedList["maxhealthExtraPoints"];
+                _effectedList["maxhealthExtraPoints"] =
+                    (14f + _affectedEntity.Stats.GetBlended("maxhealthExtraPoints"))
+                    * _effectedList["maxhealthExtraPoints"];
             }
-            foreach (KeyValuePair<string, float> stat in effectedList)
+            foreach (KeyValuePair<string, float> stat in _effectedList)
             {
-                effectedEntity.Stats.Set(stat.Key, effectCode, stat.Value, false);
+                _affectedEntity.Stats.Set(stat.Key, effectCode, stat.Value, false);
             }
-            if (effectedList.ContainsKey("maxhealthExtraPoints"))
+            if (_effectedList.ContainsKey("maxhealthExtraPoints"))
             {
-                EntityBehaviorHealth ebh = effectedEntity.GetBehavior<EntityBehaviorHealth>();
+                EntityBehaviorHealth ebh = _affectedEntity.GetBehavior<EntityBehaviorHealth>();
                 ebh.MarkDirty();
             }
         }
@@ -120,67 +112,28 @@ namespace Alchemy
         /// <summary>
         /// Iterates through the provided effect dictionary and resets every stat provided (only resets effects that has the same effectCode)
         /// </summary>
-        public void resetTempStats(float dt)
+        public void ResetTempStats()
         {
-            reset();
+            Reset();
         }
-
-        int tickCnt = 0;
-
-        public void onEffectTick(float dt)
+        
+        public void Reset()
         {
-            tickCnt++;
-            if (effectTickSec != 0)
+            foreach (var stat in _effectedList)
             {
-                if (tickCnt % effectTickSec == 0)
-                {
-                    if (effectHealth != 0)
-                    {
-                        //api.Logger.Debug("Potion tickSec: {0}", attrClass.ticksec);
-                        effectedEntity.ReceiveDamage(
-                            new DamageSource()
-                            {
-                                Source = EnumDamageSource.Internal,
-                                Type =
-                                    effectHealth > 0 ? EnumDamageType.Heal : EnumDamageType.Poison
-                            },
-                            Math.Abs(effectHealth)
-                        );
-                    }
-                }
-                if (tickCnt >= effectDuration)
-                {
-                    long effectIdGametick = effectedEntity.WatchedAttributes.GetLong(effectId);
-                    effectedEntity.World.UnregisterGameTickListener(effectIdGametick);
-                    reset();
-                }
+                _affectedEntity.Stats.Remove(stat.Key, effectCode);
             }
-        }
-
-        public void reset()
-        {
-            foreach (KeyValuePair<string, float> stat in effectedList)
+            if (_effectedList.ContainsKey("maxhealthExtraPoints"))
             {
-                effectedEntity.Stats.Remove(stat.Key, effectCode);
-            }
-            if (effectedList.ContainsKey("maxhealthExtraPoints"))
-            {
-                EntityBehaviorHealth ebh = effectedEntity.GetBehavior<EntityBehaviorHealth>();
+                EntityBehaviorHealth ebh = _affectedEntity.GetBehavior<EntityBehaviorHealth>();
                 ebh.MarkDirty();
             }
-            if (effectId.Contains("tickpotionid"))
-            {
-                long effectIdGametick = effectedEntity.WatchedAttributes.GetLong(effectId);
-                effectedEntity.World.UnregisterGameTickListener(effectIdGametick);
-                effectDuration = 0;
-                effectHealth = 0;
-                effectTickSec = 0;
-            }
-            effectedEntity.WatchedAttributes.RemoveAttribute(effectId);
+
+            _affectedEntity.WatchedAttributes.RemoveAttribute(effectId);
 
             IServerPlayer player = (
-                effectedEntity.World.PlayerByUid((effectedEntity as EntityPlayer).PlayerUID)
-                as IServerPlayer
+                _affectedEntity.World.PlayerByUid((_affectedEntity as EntityPlayer).PlayerUID)
+                    as IServerPlayer
             );
 
             if (effectId != "recallpotionid")
@@ -194,7 +147,7 @@ namespace Alchemy
 
         }
 
-        public void resetAllTempStats(EntityPlayer entity, string effectCode)
+        public static void ResetAllTempStats(EntityPlayer entity, string effectCode)
         {
             foreach (var stats in entity.Stats)
             {
@@ -204,7 +157,7 @@ namespace Alchemy
             ebh.MarkDirty();
         }
 
-        public void resetAllAttrListeners(
+        public static void ResetAllAttrListeners(
             EntityPlayer entity,
             string callbackCode,
             string listenerCode
@@ -245,9 +198,8 @@ namespace Alchemy
             }
         }
 
-        public bool resetAllListeners(EntityPlayer entity, string callbackCode, string listenerCode)
+        public static void ResetAllListeners(EntityPlayer entity, string callbackCode, string listenerCode)
         {
-            bool effectReseted = false;
             foreach (var watch in entity.WatchedAttributes.Keys)
             {
                 if (watch.Contains(callbackCode))
@@ -257,7 +209,6 @@ namespace Alchemy
                         long potionListenerId = entity.WatchedAttributes.GetLong(watch);
                         if (potionListenerId != 0)
                         {
-                            effectReseted = true;
                             entity.World.UnregisterCallback(potionListenerId);
                             entity.WatchedAttributes.RemoveAttribute(watch);
                         }
@@ -274,8 +225,6 @@ namespace Alchemy
                         long potionListenerId = entity.WatchedAttributes.GetLong(watch);
                         if (potionListenerId != 0)
                         {
-                            effectReseted = true;
-                            entity.World.UnregisterGameTickListener(potionListenerId);
                             entity.WatchedAttributes.RemoveAttribute(watch);
                         }
                     }
@@ -285,7 +234,6 @@ namespace Alchemy
                     }
                 }
             }
-            return effectReseted;
         }
     }
 }

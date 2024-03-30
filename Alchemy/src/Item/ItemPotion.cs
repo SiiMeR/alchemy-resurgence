@@ -17,7 +17,7 @@ namespace Alchemy
 
     public class ItemPotion : Item
     {
-        public Dictionary<string, float> dic = new();
+        public Dictionary<string, float> EffectDictionary = new();
         public string potionId;
         public int duration;
         public int tickSec = 0;
@@ -106,19 +106,19 @@ namespace Alchemy
             {
                 try
                 {
-                    dic = effects.AsObject<Dictionary<string, float>>();
+                    EffectDictionary = effects.AsObject<Dictionary<string, float>>();
                     switch (strength)
                     {
                         case "strong":
-                            foreach (var k in dic.Keys.ToList())
+                            foreach (var k in EffectDictionary.Keys.ToList())
                             {
-                                dic[k] *= 3;
+                                EffectDictionary[k] *= 3;
                             }
                             break;
                         case "medium":
-                            foreach (var k in dic.Keys.ToList())
+                            foreach (var k in EffectDictionary.Keys.ToList())
                             {
-                                dic[k] *= 2;
+                                EffectDictionary[k] *= 2;
                             }
                             break;
                         default:
@@ -128,7 +128,7 @@ namespace Alchemy
                 catch (Exception e)
                 {
                     api.World.Logger.Error("Failed loading potion effects for potion {0}. Will ignore. Exception: {1}", Code, e);
-                    dic.Clear();
+                    EffectDictionary.Clear();
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace Alchemy
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
             //api.Logger.Debug("potion {0}, {1}", dic.Count, potionId);
-            if (potionId != "" && potionId != null)
+            if (!string.IsNullOrEmpty(potionId))
             {
                 //api.Logger.Debug("[Potion] check if drinkable {0}", byEntity.WatchedAttributes.GetLong(potionId));
                 /* This checks if the potion effect callback is on */
@@ -197,146 +197,146 @@ namespace Alchemy
 
         public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            if (secondsUsed > 1.45f && byEntity.World.Side == EnumAppSide.Server)
+            if (secondsUsed < 1.45f || byEntity.World.Side != EnumAppSide.Server) return;
+            
+            if (potionId is "recallpotionid" or "nutritionpotionid")
             {
-                if (potionId == "recallpotionid" || potionId == "nutritionpotionid")
-                {
 
-                }
-                else if (tickSec == 0)
+            }
+            else if (tickSec == 0)
+            {
+                TempEffect potionEffect = new TempEffect();
+                potionEffect.TempEntityStats((byEntity as EntityPlayer), EffectDictionary, "potionmod", duration, potionId);
+            }
+            if (byEntity is EntityPlayer entityPlayer)
+            {
+                IServerPlayer player = (entityPlayer.World.PlayerByUid(entityPlayer.PlayerUID) as IServerPlayer);
+                switch (potionId)
                 {
-                    TempEffect potionEffect = new TempEffect();
-                    potionEffect.tempEntityStats((byEntity as EntityPlayer), dic, "potionmod", duration, potionId);
-                }
-                else
-                {
-                    TempEffect potionEffect = new TempEffect();
-                    potionEffect.tempTickEntityStats((byEntity as EntityPlayer), dic, "potionmod", duration, potionId, tickSec, health);
-                }
-                if (byEntity is EntityPlayer)
-                {
-                    IServerPlayer player = (byEntity.World.PlayerByUid((byEntity as EntityPlayer).PlayerUID) as IServerPlayer);
-                    if (potionId == "recallpotionid")
+                    case "recallpotionid":
                     {
                         if (api.Side.IsServer())
                         {
                             FuzzyEntityPos spawn = player.GetSpawnPosition(false);
-                            byEntity.TeleportTo(spawn);
+                            entityPlayer.TeleportTo(spawn);
                         }
                         player.SendMessage(
                             GlobalConstants.InfoLogChatGroup,
                             "You feel the effects of the " + slot.Itemstack.GetName(),
                             EnumChatType.Notification
                         );
+                        break;
                     }
-                    else if (potionId == "nutritionpotionid") {
-                        ITreeAttribute hungerTree = byEntity.WatchedAttributes.GetTreeAttribute("hunger");
+                    case "nutritionpotionid":
+                    {
+                        ITreeAttribute hungerTree = entityPlayer.WatchedAttributes.GetTreeAttribute("hunger");
                         if (hungerTree != null) {
                             float fruitLevel = hungerTree.GetFloat("fruitLevel");
                             float vegetableLevel = hungerTree.GetFloat("vegetableLevel");
                             float grainLevel = hungerTree.GetFloat("grainLevel");
                             float proteinLevel = hungerTree.GetFloat("proteinLevel");
                             float dairyLevel = hungerTree.GetFloat("dairyLevel");
-                            byEntity.World.Logger.Debug("fruit level: {0}", fruitLevel);
-                            byEntity.World.Logger.Debug("vegetableLevel: {0}", vegetableLevel);
-                            byEntity.World.Logger.Debug("grainLevel: {0}", grainLevel);
-                            byEntity.World.Logger.Debug("proteinLevel: {0}", proteinLevel);
-                            byEntity.World.Logger.Debug("dairyLevel: {0}", dairyLevel);
+                            entityPlayer.World.Logger.Debug("fruit level: {0}", fruitLevel);
+                            entityPlayer.World.Logger.Debug("vegetableLevel: {0}", vegetableLevel);
+                            entityPlayer.World.Logger.Debug("grainLevel: {0}", grainLevel);
+                            entityPlayer.World.Logger.Debug("proteinLevel: {0}", proteinLevel);
+                            entityPlayer.World.Logger.Debug("dairyLevel: {0}", dairyLevel);
                         }
-                    }
-                    else
-                    {
-                        player.SendMessage(GlobalConstants.InfoLogChatGroup, "You feel the effects of the " + slot.Itemstack.GetName(), EnumChatType.Notification);
-                    }
-                }
 
-                slot.TakeOut(1);
-                slot.MarkDirty();
+                        break;
+                    }
+                    default:
+                        player.SendMessage(GlobalConstants.InfoLogChatGroup, "You feel the effects of the " + slot.Itemstack.GetName(), EnumChatType.Notification);
+                        break;
+                }
             }
+
+            slot.TakeOut(1);
+            slot.MarkDirty();
         }
 
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            if (dic != null)
+            if (EffectDictionary != null)
             {
                 dsc.AppendLine(Lang.Get("\n"));
-                if (dic.ContainsKey("rangedWeaponsAcc"))
+                if (EffectDictionary.ContainsKey("rangedWeaponsAcc"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged accuracy", Math.Round(dic["rangedWeaponsAcc"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged accuracy", Math.Round(EffectDictionary["rangedWeaponsAcc"] * 100, 1)));
                 }
-                if (dic.ContainsKey("animalLootDropRate"))
+                if (EffectDictionary.ContainsKey("animalLootDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more animal loot", Math.Round(dic["animalLootDropRate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more animal loot", Math.Round(EffectDictionary["animalLootDropRate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("animalHarvestingTime"))
+                if (EffectDictionary.ContainsKey("animalHarvestingTime"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% faster animal harvest", Math.Round(dic["animalHarvestingTime"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% faster animal harvest", Math.Round(EffectDictionary["animalHarvestingTime"] * 100, 1)));
                 }
-                if (dic.ContainsKey("animalSeekingRange"))
+                if (EffectDictionary.ContainsKey("animalSeekingRange"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0}% animal seek range", Math.Round(dic["animalSeekingRange"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0}% animal seek range", Math.Round(EffectDictionary["animalSeekingRange"] * 100, 1)));
                 }
-                if (dic.ContainsKey("maxhealthExtraPoints"))
+                if (EffectDictionary.ContainsKey("maxhealthExtraPoints"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0} extra max health", dic["maxhealthExtraPoints"]));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0} extra max health", EffectDictionary["maxhealthExtraPoints"]));
                 }
-                if (dic.ContainsKey("forageDropRate"))
+                if (EffectDictionary.ContainsKey("forageDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0}% more forage amount", Math.Round(dic["forageDropRate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0}% more forage amount", Math.Round(EffectDictionary["forageDropRate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("healingeffectivness"))
+                if (EffectDictionary.ContainsKey("healingeffectivness"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% healing effectiveness", Math.Round(dic["healingeffectivness"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% healing effectiveness", Math.Round(EffectDictionary["healingeffectivness"] * 100, 1)));
                 }
-                if (dic.ContainsKey("hungerrate"))
+                if (EffectDictionary.ContainsKey("hungerrate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: {0}% hunger rate", Math.Round(dic["hungerrate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: {0}% hunger rate", Math.Round(EffectDictionary["hungerrate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("meleeWeaponsDamage"))
+                if (EffectDictionary.ContainsKey("meleeWeaponsDamage"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% melee damage", Math.Round(dic["meleeWeaponsDamage"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% melee damage", Math.Round(EffectDictionary["meleeWeaponsDamage"] * 100, 1)));
                 }
-                if (dic.ContainsKey("mechanicalsDamage"))
+                if (EffectDictionary.ContainsKey("mechanicalsDamage"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mechanincal damage (not sure if works)", Math.Round(dic["mechanicalsDamage"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mechanical damage (not sure if works)", Math.Round(EffectDictionary["mechanicalsDamage"] * 100, 1)));
                 }
-                if (dic.ContainsKey("miningSpeedMul"))
+                if (EffectDictionary.ContainsKey("miningSpeedMul"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mining speed", Math.Round(dic["miningSpeedMul"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% mining speed", Math.Round(EffectDictionary["miningSpeedMul"] * 100, 1)));
                 }
-                if (dic.ContainsKey("oreDropRate"))
+                if (EffectDictionary.ContainsKey("oreDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more ore", Math.Round(dic["oreDropRate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more ore", Math.Round(EffectDictionary["oreDropRate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("rangedWeaponsDamage"))
+                if (EffectDictionary.ContainsKey("rangedWeaponsDamage"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged damage", Math.Round(dic["rangedWeaponsDamage"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged damage", Math.Round(EffectDictionary["rangedWeaponsDamage"] * 100, 1)));
                 }
-                if (dic.ContainsKey("rangedWeaponsSpeed"))
+                if (EffectDictionary.ContainsKey("rangedWeaponsSpeed"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged speed", Math.Round(dic["rangedWeaponsSpeed"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% ranged speed", Math.Round(EffectDictionary["rangedWeaponsSpeed"] * 100, 1)));
                 }
-                if (dic.ContainsKey("rustyGearDropRate"))
+                if (EffectDictionary.ContainsKey("rustyGearDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more gears from metal piles", Math.Round(dic["rustyGearDropRate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more gears from metal piles", Math.Round(EffectDictionary["rustyGearDropRate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("walkspeed"))
+                if (EffectDictionary.ContainsKey("walkspeed"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% walk speed", Math.Round(dic["walkspeed"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% walk speed", Math.Round(EffectDictionary["walkspeed"] * 100, 1)));
                 }
-                if (dic.ContainsKey("vesselContentsDropRate"))
+                if (EffectDictionary.ContainsKey("vesselContentsDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more vessel contents", Math.Round(dic["vesselContentsDropRate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% more vessel contents", Math.Round(EffectDictionary["vesselContentsDropRate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("wildCropDropRate"))
+                if (EffectDictionary.ContainsKey("wildCropDropRate"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% wild crop", Math.Round(dic["wildCropDropRate"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% wild crop", Math.Round(EffectDictionary["wildCropDropRate"] * 100, 1)));
                 }
-                if (dic.ContainsKey("wholeVesselLootChance"))
+                if (EffectDictionary.ContainsKey("wholeVesselLootChance"))
                 {
-                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% chance to get whole vessel", Math.Round(dic["wholeVesselLootChance"] * 100, 1)));
+                    dsc.AppendLine(Lang.Get("When potion is used: +{0}% chance to get whole vessel", Math.Round(EffectDictionary["wholeVesselLootChance"] * 100, 1)));
                 }
             }
 
