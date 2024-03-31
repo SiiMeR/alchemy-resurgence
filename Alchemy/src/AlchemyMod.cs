@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Alchemy.Behavior;
 using HarmonyLib;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -30,7 +31,6 @@ namespace Alchemy
             
         }
 
-        /* This override is to add the PotionFixBehavior to the player and to reset all of the potion stats to default */
         public override void StartServerSide(ICoreServerAPI api)
         {
             api.Event.PlayerNowPlaying += (IServerPlayer iServerPlayer) =>
@@ -39,7 +39,9 @@ namespace Alchemy
                 {
                     Entity entity = iServerPlayer.Entity;
                     entity.AddBehavior(new PotionFixBehavior(entity));
-
+                    entity.AddBehavior(new CancelRecallOnHitBehavior(entity));
+                    
+                    
                     EntityPlayer player = iServerPlayer.Entity;
                     TempEffect.ResetAllTempStats(player, "potionmod");
                     TempEffect.ResetAllAttrListeners(player, "potionid", "tickpotionid");

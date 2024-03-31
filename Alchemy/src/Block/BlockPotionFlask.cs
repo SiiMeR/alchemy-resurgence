@@ -422,11 +422,15 @@ namespace Alchemy
 
                 if (effectSuccessfullyApplied)
                 {
-                    serverPlayer.SendMessage(
-                        GlobalConstants.InfoLogChatGroup,
-                        "You feel the effects of the " + content.GetName(),
-                        EnumChatType.Notification
-                    );
+                    if (potionId != "recallpotionid")
+                    {
+                        serverPlayer.SendMessage(
+                            GlobalConstants.InfoLogChatGroup,
+                            "You feel the effects of the " + content.GetName(),
+                            EnumChatType.Notification
+                        );
+                    }
+
                 }
                 else
                 {
@@ -445,13 +449,18 @@ namespace Alchemy
                         playerEntity.World.RegisterCallback(
                             (dt) =>
                             {
-                                serverPlayer.SendMessage(
-                                    GlobalConstants.InfoLogChatGroup,
-                                    "You feel the effects of the " + content.GetName(),
-                                    EnumChatType.Notification
-                                );
-                                FuzzyEntityPos spawn = serverPlayer.GetSpawnPosition(false);
-                                byEntity.TeleportTo(spawn);
+                                // if the player was hit in the meantime, don't recall
+                                if (playerEntity.WatchedAttributes.GetLong("recallpotionid") != 0)
+                                {
+                                    serverPlayer.SendMessage(
+                                        GlobalConstants.InfoLogChatGroup,
+                                        "You feel the effects of the " + content.GetName(),
+                                        EnumChatType.Notification
+                                    );
+                                    FuzzyEntityPos spawn = serverPlayer.GetSpawnPosition(false);
+                                    byEntity.TeleportTo(spawn);
+                                }
+
                             },
                             30000
                         );

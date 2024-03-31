@@ -22,7 +22,7 @@
         "duration": 30
       },
       "effects": {
-        "walkspeed": -0.4
+        "walkspeed": -0.2
       },
       "waterTightContainerProps": {
         "containable": true,
