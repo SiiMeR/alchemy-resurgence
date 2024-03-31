@@ -426,7 +426,7 @@
     "*-speed-*": {
       "potioninfo": {
         "potionId": "speedpotionid",
-        "duration": 300
+        "duration": 6
       },
       "effects": {
         "walkspeed": 0.1

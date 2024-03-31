@@ -197,58 +197,54 @@ namespace Alchemy
 
         public override void OnHeldInteractStop(float secondsUsed, ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel)
         {
-            if (secondsUsed < 1.45f || byEntity.World.Side != EnumAppSide.Server) return;
-            
-            if (potionId is "recallpotionid" or "nutritionpotionid")
+            var content = slot.Itemstack;
+            if (secondsUsed < 1.45f || byEntity.World.Side != EnumAppSide.Server || content == null ||
+                byEntity is not EntityPlayer playerEntity || playerEntity.Player is not IServerPlayer serverPlayer)
             {
-
+                base.OnHeldInteractStop(secondsUsed, slot, byEntity, blockSel, entitySel);
+                return;
             }
-            else if (tickSec == 0)
+
+            
+            JsonObject tickPotion = content.ItemAttributes?["tickpotioninfo"];
+            bool effectSuccessfullyApplied;
+            if (tickPotion?.Exists ?? false)
             {
                 TempEffect potionEffect = new TempEffect();
-                potionEffect.TempEntityStats((byEntity as EntityPlayer), EffectDictionary, "potionmod", duration, potionId);
+                effectSuccessfullyApplied = potionEffect.TempEntityStats(
+                    playerEntity,
+                    EffectDictionary,
+                    "potionmod",
+                    duration,
+                    potionId,
+                    true,
+                    tickPotion["ticksec"].AsInt(5),
+                    tickPotion["health"].AsFloat()
+                );
             }
-            if (byEntity is EntityPlayer entityPlayer)
+            else
             {
-                IServerPlayer player = (entityPlayer.World.PlayerByUid(entityPlayer.PlayerUID) as IServerPlayer);
-                switch (potionId)
-                {
-                    case "recallpotionid":
-                    {
-                        if (api.Side.IsServer())
-                        {
-                            FuzzyEntityPos spawn = player.GetSpawnPosition(false);
-                            entityPlayer.TeleportTo(spawn);
-                        }
-                        player.SendMessage(
-                            GlobalConstants.InfoLogChatGroup,
-                            "You feel the effects of the " + slot.Itemstack.GetName(),
-                            EnumChatType.Notification
-                        );
-                        break;
-                    }
-                    case "nutritionpotionid":
-                    {
-                        ITreeAttribute hungerTree = entityPlayer.WatchedAttributes.GetTreeAttribute("hunger");
-                        if (hungerTree != null) {
-                            float fruitLevel = hungerTree.GetFloat("fruitLevel");
-                            float vegetableLevel = hungerTree.GetFloat("vegetableLevel");
-                            float grainLevel = hungerTree.GetFloat("grainLevel");
-                            float proteinLevel = hungerTree.GetFloat("proteinLevel");
-                            float dairyLevel = hungerTree.GetFloat("dairyLevel");
-                            entityPlayer.World.Logger.Debug("fruit level: {0}", fruitLevel);
-                            entityPlayer.World.Logger.Debug("vegetableLevel: {0}", vegetableLevel);
-                            entityPlayer.World.Logger.Debug("grainLevel: {0}", grainLevel);
-                            entityPlayer.World.Logger.Debug("proteinLevel: {0}", proteinLevel);
-                            entityPlayer.World.Logger.Debug("dairyLevel: {0}", dairyLevel);
-                        }
+                TempEffect potionEffect = new TempEffect();
+                effectSuccessfullyApplied =  potionEffect.TempEntityStats(
+                    playerEntity,
+                    EffectDictionary,
+                    "potionmod",
+                    duration,
+                    potionId
+                );
+            }
 
-                        break;
-                    }
-                    default:
-                        player.SendMessage(GlobalConstants.InfoLogChatGroup, "You feel the effects of the " + slot.Itemstack.GetName(), EnumChatType.Notification);
-                        break;
-                }
+            if (effectSuccessfullyApplied)
+            {
+                serverPlayer.SendMessage(
+                    GlobalConstants.InfoLogChatGroup,
+                    "You feel the effects of the " + content.GetName(),
+                    EnumChatType.Notification
+                );
+            }
+            else
+            {
+                return;
             }
 
             slot.TakeOut(1);

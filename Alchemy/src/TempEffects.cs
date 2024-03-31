@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
@@ -27,7 +28,7 @@ namespace Alchemy
         /// <param name="tickTimeSeconds">How long does a tick take</param>
         /// <param name="hpPerTick">How much HP the entity will gain/lose per tick</param>
         /// <param name="shouldTick">If the potion is a tick effect, this should be set to true.</param>
-        public void TempEntityStats(
+        public bool TempEntityStats(
             EntityPlayer entity,
             Dictionary<string, float> effectList,
             string code,
@@ -45,11 +46,16 @@ namespace Alchemy
             if (shouldTick)
             {
                 HandleTickPotion(duration, tickTimeSeconds, hpPerTick);
+                return true;
             }
-            else
+
+            if (effectId == "speedpotionid" & _affectedEntity.WatchedAttributes.GetLong("recallpotionid") != 0)
             {
-                SetTempStats();
+                return false;
             }
+                
+            SetTempStats(duration);
+            return true;
         }
 
         private void HandleTickPotion(int durationSeconds, int tickTimeSeconds, float hpPerTick)
@@ -82,7 +88,8 @@ namespace Alchemy
         /// <summary>
         /// Iterates through the provided effect dictionary and sets every stat provided
         /// </summary>
-        public void SetTempStats()
+        /// <param name="duration"></param>
+        public void SetTempStats(int duration)
         {
             if (_effectedList.ContainsKey("maxhealthExtraPoints"))
             {
@@ -107,6 +114,13 @@ namespace Alchemy
                 EntityBehaviorHealth ebh = _affectedEntity.GetBehavior<EntityBehaviorHealth>();
                 ebh.MarkDirty();
             }
+
+            var id = _affectedEntity.World.RegisterCallback((dt) =>
+            {
+                ResetTempStats();
+            }, duration * 1000);
+
+            _affectedEntity.WatchedAttributes.SetLong(effectId, id);
         }
 
         /// <summary>
@@ -119,6 +133,7 @@ namespace Alchemy
         
         public void Reset()
         {
+            _affectedEntity.World.Logger.Debug($"Resetting stats of {effectId}: {JsonUtil.ToString(_effectedList.Keys)}");
             foreach (var stat in _effectedList)
             {
                 _affectedEntity.Stats.Remove(stat.Key, effectCode);

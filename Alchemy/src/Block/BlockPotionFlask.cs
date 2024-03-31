@@ -379,6 +379,13 @@ namespace Alchemy
                 base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
                 return;
             }
+            
+            if (playerEntity.Player is not IServerPlayer serverPlayer)
+            {
+                api.Logger.Debug($"playerEntity.Player is null for {playerEntity.PlayerUID}");
+                base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
+                return;
+            }
 
             if (potionId == "nutritionpotionid")
             {
@@ -386,10 +393,11 @@ namespace Alchemy
             else
             {
                 JsonObject tickPotion = content.ItemAttributes?["tickpotioninfo"];
+                bool effectSuccessfullyApplied;
                 if (tickPotion?.Exists ?? false)
                 {
                     TempEffect potionEffect = new TempEffect();
-                    potionEffect.TempEntityStats(
+                    effectSuccessfullyApplied = potionEffect.TempEntityStats(
                         playerEntity,
                         EffectDictionary,
                         "potionmod",
@@ -403,7 +411,7 @@ namespace Alchemy
                 else
                 {
                     TempEffect potionEffect = new TempEffect();
-                    potionEffect.TempEntityStats(
+                    effectSuccessfullyApplied =  potionEffect.TempEntityStats(
                         playerEntity,
                         EffectDictionary,
                         "potionmod",
@@ -411,14 +419,22 @@ namespace Alchemy
                         potionId
                     );
                 }
+
+                if (effectSuccessfullyApplied)
+                {
+                    serverPlayer.SendMessage(
+                        GlobalConstants.InfoLogChatGroup,
+                        "You feel the effects of the " + content.GetName(),
+                        EnumChatType.Notification
+                    );
+                }
+                else
+                {
+                    return;
+                }
             }
             
-            if (playerEntity.Player is not IServerPlayer serverPlayer)
-            {
-                api.Logger.Debug($"playerEntity.Player is null for {playerEntity.PlayerUID}");
-                base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
-                return;
-            }
+
             
             switch (potionId)
             {
@@ -474,13 +490,6 @@ namespace Alchemy
 
                     break;
                 }
-                default:
-                    serverPlayer.SendMessage(
-                        GlobalConstants.InfoLogChatGroup,
-                        "You feel the effects of the " + content.GetName(),
-                        EnumChatType.Notification
-                    );
-                    break;
             }
 
             splitStackAndPerformAction(
