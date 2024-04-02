@@ -144,15 +144,15 @@ namespace Alchemy
                 ebh.MarkDirty();
             }
 
-            _affectedEntity.WatchedAttributes.RemoveAttribute(effectId);
-
-            IServerPlayer player = (
-                _affectedEntity.World.PlayerByUid((_affectedEntity as EntityPlayer).PlayerUID)
-                    as IServerPlayer
-            );
-
             if (effectId != "recallpotionid")
             {
+                _affectedEntity.WatchedAttributes.RemoveAttribute(effectId);
+
+                IServerPlayer player = (
+                    _affectedEntity.World.PlayerByUid(_affectedEntity.PlayerUID)
+                        as IServerPlayer
+                );
+                
                 player.SendMessage(
                     GlobalConstants.InfoLogChatGroup,
                     "You feel the effects of the potion dissipate",

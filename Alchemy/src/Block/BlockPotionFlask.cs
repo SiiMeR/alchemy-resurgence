@@ -460,6 +460,9 @@ namespace Alchemy
                                     FuzzyEntityPos spawn = serverPlayer.GetSpawnPosition(false);
                                     byEntity.TeleportTo(spawn);
                                 }
+                                
+                                playerEntity.WatchedAttributes.RemoveAttribute("recallpotionid");
+
 
                             },
                             30000
