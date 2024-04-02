@@ -40,7 +40,7 @@ namespace Alchemy
         )
         {
             _affectedEntity = entity;
-            _effectedList = effectList;
+            _effectedList = new Dictionary<string, float>(effectList);
             effectCode = code;
             effectId = id;
             if (shouldTick)
