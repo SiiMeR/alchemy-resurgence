@@ -30,13 +30,11 @@ public class CancelRecallOnHitBehavior : EntityBehavior
     /* This override is to add the behavior to the player of when they die they also reset all of their potion effects */
     public override void OnEntityReceiveDamage(DamageSource damageSource, ref float damage)
     {
-        if (damageSource.Source == EnumDamageSource.Player)
+        IServerPlayer player = GetIServerPlayer();
+
+        if (damageSource.Source == EnumDamageSource.Player && player.Entity.WatchedAttributes.GetLong("recallpotionid") != 0)
         {
-            IServerPlayer player = GetIServerPlayer();
-            if (player.Entity.WatchedAttributes.GetLong("recallpotionid") != 0)
-            {
-                player.Entity.WatchedAttributes.RemoveAttribute("recallpotionid");
-            }
+            player.Entity.WatchedAttributes.RemoveAttribute("recallpotionid");
 
             player.SendMessage(GlobalConstants.InfoLogChatGroup,
                 "Your recall was cancelled due to taking damage from a player!", EnumChatType.Notification);
