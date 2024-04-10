@@ -19,7 +19,7 @@
     "*-recall": {
       "potioninfo": {
         "potionId": "recallpotionid",
-        "duration": 30
+        "duration": 20
       },
       "effects": {
         "walkspeed": -0.2

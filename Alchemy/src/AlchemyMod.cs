@@ -28,7 +28,6 @@ namespace Alchemy
             api.RegisterBlockEntityClass("BlockEntityPotionFlask", typeof(BlockEntityPotionFlask));
             api.RegisterBlockClass("BlockHerbRacks", typeof(BlockHerbRacks));
             api.RegisterBlockEntityClass("HerbRacks", typeof(BlockEntityHerbRacks));
-            
         }
 
         public override void StartServerSide(ICoreServerAPI api)

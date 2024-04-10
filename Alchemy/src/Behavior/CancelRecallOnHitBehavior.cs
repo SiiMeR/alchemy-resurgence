@@ -26,7 +26,6 @@ public class CancelRecallOnHitBehavior : EntityBehavior
         return serverPlayer;
     }
 
-
     /* This override is to add the behavior to the player of when they die they also reset all of their potion effects */
     public override void OnEntityReceiveDamage(DamageSource damageSource, ref float damage)
     {

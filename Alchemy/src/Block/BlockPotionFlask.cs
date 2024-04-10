@@ -465,7 +465,7 @@ namespace Alchemy
 
 
                             },
-                            30000
+                            20000
                         );
                     }
 
