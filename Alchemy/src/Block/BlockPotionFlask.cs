@@ -518,19 +518,30 @@ namespace Alchemy
 
         #endregion
 
+        public override void TryMergeStacks(ItemStackMergeOperation op)
+        {
+            if (op.SourceSlot.Itemstack.Collectible.Class == "BlockPotionFlask" &&
+                op.SinkSlot.Itemstack.Collectible.Class == "BlockPotionFlask")
+            {
+                return;
+            }
+            
+            base.TryMergeStacks(op);
+        }
+
         private int splitStackAndPerformAction(
             Entity byEntity,
             ItemSlot slot, System.Func<ItemStack, int> action
         )
         {
+            int moved = 0;
+            
             if (slot.Itemstack.StackSize == 1)
             {
-                int moved = action(slot.Itemstack);
+                moved = action(slot.Itemstack);
 
                 if (moved > 0)
                 {
-                    int maxstacksize = slot.Itemstack.Collectible.MaxStackSize;
-
                     (byEntity as EntityPlayer)?.WalkInventory(
                         (pslot) =>
                         {
@@ -568,15 +579,13 @@ namespace Alchemy
                         }
                     );
                 }
-
-                return moved;
             }
             else
             {
                 ItemStack containerStack = slot.Itemstack.Clone();
                 containerStack.StackSize = 1;
 
-                int moved = action(containerStack);
+                moved = action(containerStack);
 
                 if (moved > 0)
                 {
@@ -591,11 +600,14 @@ namespace Alchemy
                         api.World.SpawnItemEntity(containerStack, byEntity.SidedPos.XYZ);
                     }
 
+
                     slot.MarkDirty();
                 }
 
-                return moved;
             }
+
+            return moved;
+
         }
 
         public override void GetHeldItemInfo(
