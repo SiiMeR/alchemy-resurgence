@@ -84,7 +84,7 @@ namespace Alchemy
                     switch (strength)
                     {
                         case "strong":
-                            health *= 3;
+                            health *= 4;
                             break;
                         case "medium":
                             health *= 2;
@@ -112,7 +112,7 @@ namespace Alchemy
                         case "strong":
                             foreach (var k in EffectDictionary.Keys.ToList())
                             {
-                                EffectDictionary[k] *= 3;
+                                EffectDictionary[k] *= 4;
                             }
                             break;
                         case "medium":
@@ -219,7 +219,7 @@ namespace Alchemy
                     potionId,
                     true,
                     tickPotion["ticksec"].AsInt(5),
-                    tickPotion["health"].AsFloat()
+                    tickPotion["health"].AsFloat() * Util.GetStrengthModifier(content)
                 );
             }
             else

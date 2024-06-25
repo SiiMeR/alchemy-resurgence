@@ -280,7 +280,7 @@ namespace Alchemy
                         case "strong":
                             foreach (var k in EffectDictionary.Keys.ToList())
                             {
-                                EffectDictionary[k] *= 3;
+                                EffectDictionary[k] *= 4;
                             }
 
                             break;
@@ -356,8 +356,8 @@ namespace Alchemy
 
             return secondsUsed <= 1.5f;
 
-        }
-
+        } 
+        
         public override void OnHeldInteractStop(
             float secondsUsed,
             ItemSlot slot,
@@ -377,7 +377,7 @@ namespace Alchemy
             if (!content.MatchesSearchText(playerEntity.World, "potion"))
             {
                 base.OnHeldInteractStop(secondsUsed, slot, playerEntity, blockSel, entitySel);
-                return;
+                return; 
             }
             
             if (playerEntity.Player is not IServerPlayer serverPlayer)
@@ -387,7 +387,7 @@ namespace Alchemy
                 return;
             }
 
-            if (potionId == "nutritionpotionid")
+            if (potionId is "nutritionpotionid" or "temporalpotionid")
             {
             }
             else
@@ -405,7 +405,7 @@ namespace Alchemy
                         potionId,
                         true,
                         tickPotion["ticksec"].AsInt(5),
-                        tickPotion["health"].AsFloat()
+                        tickPotion["health"].AsFloat()  * Util.GetStrengthModifier(content)
                     );
                 }
                 else
@@ -442,6 +442,20 @@ namespace Alchemy
             
             switch (potionId)
             {
+                case "temporalpotionid":
+                {
+                    try
+                    {
+                        byEntity
+                            .GetBehavior<EntityBehaviorTemporalStabilityAffected>()
+                            .OwnStability += 0.2;
+                    }
+                    catch(Exception e){
+                        api.Logger.Debug("No EntityBehaviorTemporalStabilityAffected found");
+                        return;
+                    }
+                    break;
+                }
                 case "recallpotionid":
                 {
                     if (api.Side.IsServer())
@@ -481,22 +495,15 @@ namespace Alchemy
                     );
                     if (hungerTree != null)
                     {
-                        var totalSatiety =
-                        (
-                            hungerTree.GetFloat("fruitLevel")
-                            + hungerTree.GetFloat("vegetableLevel")
-                            + hungerTree.GetFloat("grainLevel")
-                            + hungerTree.GetFloat("proteinLevel")
-                            + hungerTree.GetFloat("dairyLevel")
-                        ) * 0.9f;
-                        hungerTree.SetFloat("fruitLevel", Math.Max(totalSatiety / 5, 0));
+                        var totalSatiety = hungerTree.GetFloat("maxsaturation");
+                        hungerTree.SetFloat("fruitLevel", Math.Max(totalSatiety / 20, 0));
                         hungerTree.SetFloat(
                             "vegetableLevel",
-                            Math.Max(totalSatiety / 5, 0)
+                            Math.Max(totalSatiety / 20, 0)
                         );
-                        hungerTree.SetFloat("grainLevel", Math.Max(totalSatiety / 5, 0));
-                        hungerTree.SetFloat("proteinLevel", Math.Max(totalSatiety / 5, 0));
-                        hungerTree.SetFloat("dairyLevel", Math.Max(totalSatiety / 5, 0));
+                        hungerTree.SetFloat("grainLevel", Math.Max(totalSatiety / 20, 0));
+                        hungerTree.SetFloat("proteinLevel", Math.Max(totalSatiety / 20, 0));
+                        hungerTree.SetFloat("dairyLevel", Math.Max(totalSatiety / 20, 0));
                         playerEntity.WatchedAttributes.MarkPathDirty("hunger");
                     }
 
