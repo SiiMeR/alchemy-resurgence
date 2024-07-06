@@ -2,7 +2,7 @@
 	"type": "code",
 	"name": "Alchemy (Resurgence)",
 	"modid": "alchemyresurgence",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"iconpath": "modicon.png",
 	
 	"description" : "An alchemy mod that adds a couple of player enhancing potions.",

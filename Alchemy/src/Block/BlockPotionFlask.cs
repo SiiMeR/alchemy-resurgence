@@ -527,11 +527,8 @@ namespace Alchemy
 
         public override void TryMergeStacks(ItemStackMergeOperation op)
         {
-            if (op.SourceSlot.Itemstack.Collectible.Class == "BlockPotionFlask" &&
-                op.SinkSlot.Itemstack.Collectible.Class == "BlockPotionFlask")
-            {
+            if (op.SourceSlot.Itemstack.StackSize > 1 && op.SourceSlot.Itemstack.Attributes.Count != 0)  
                 return;
-            }
             
             base.TryMergeStacks(op);
         }
