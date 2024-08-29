@@ -1,18 +1,19 @@
 {
-	"type": "code",
-	"name": "Alchemy (Resurgence)",
-	"modid": "alchemyresurgence",
-	"version": "1.2.1",
-	"iconpath": "modicon.png",
-	
-	"description" : "An alchemy mod that adds a couple of player enhancing potions.",
-	"website": "https://github.com/SiiMeR/alchemy-resurgence",
-	"authors": [ "Llama3013", "SiiMeR" ],
-	"RequiredOnServer": true,
-	"RequiredOnClient": true,
-
-	"dependencies": {
-		"game": "1.19.8",
-		"wildcraftherb": "0.0.0"
-	}
+  "type": "code",
+  "name": "Alchemy (Resurgence)",
+  "modid": "alchemyresurgence",
+  "version": "1.3.0",
+  "iconpath": "modicon.png",
+  "description": "An alchemy mod that adds a couple of player enhancing potions.",
+  "website": "https://github.com/SiiMeR/alchemy-resurgence",
+  "authors": [
+    "Llama3013",
+    "SiiMeR"
+  ],
+  "RequiredOnServer": true,
+  "RequiredOnClient": true,
+  "dependencies": {
+    "game": "1.19.8",
+    "wildcraftherb": "0.0.0"
+  }
 }
